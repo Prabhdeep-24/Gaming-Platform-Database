@@ -1,0 +1,323 @@
+create database gamingPlatform;
+use gamingPlatform;
+
+create table Player(PlayerId int primary key,
+  Username varchar(40),
+  Email varchar(40),
+  PasswordHash char(32),
+  Gender char(1),
+  CountryCode int,
+  RegionId int,
+  DateJoined date,
+  DateOfBirth date,
+  ProfileImage varchar(40),
+  lastActivity datetime,
+  IsBanned boolean
+);
+
+create Table Country(
+  CountryId int primary key,
+  CountryName varchar(30)
+);
+
+CREATE TABLE Region (
+  RegionId INT PRIMARY KEY,
+  RegionName VARCHAR(255)
+);
+
+CREATE TABLE RegionToCountry (
+  RegionId INT,
+  CountryId INT,
+  PRIMARY KEY (RegionId, CountryId)
+);
+
+CREATE TABLE PlayerSession (
+  SessionId INT PRIMARY KEY,
+  playerId INT,
+  Logintime TIME,
+  LogoutTime TIME
+);
+
+CREATE TABLE Genre (
+  GenreId INT PRIMARY KEY,
+  Name VARCHAR(255)
+);
+
+CREATE TABLE MatchType (
+  MatchTypeId INT PRIMARY KEY,
+  MatchTypeName VARCHAR(255)
+);
+
+CREATE TABLE Preferences (
+  PlayerId INT,
+  PreferredGenreId INT,
+  PreferredMatchTypeId INT,
+  PRIMARY KEY (PlayerId, PreferredGenreId, PreferredMatchTypeId)
+);
+
+CREATE TABLE GameMode (
+  GameModeId INT PRIMARY KEY,
+  Name VARCHAR(255),
+  Description VARCHAR(255),
+  MaxPlayers INT,
+  TeamSize INT
+);
+
+CREATE TABLE Game (
+  GameId INT PRIMARY KEY,
+  Title VARCHAR(255),
+  GenreId INT,
+  Description VARCHAR(255),
+  Paid BOOLEAN,
+  ThumbnailImage VARCHAR(255),
+  BackgroundImage VARCHAR(255)
+);
+
+CREATE TABLE GameBanned (
+  GameBanId INT PRIMARY KEY,
+  GameId INT,
+  RegionId INT,
+  CountryId INT
+);
+
+CREATE TABLE Achievement (
+  AchievementId INT PRIMARY KEY,
+  Name VARCHAR(255),
+  Description VARCHAR(255)
+);
+
+CREATE TABLE PlayerAchievement (
+  PlayerId INT,
+  AchievementId INT,
+  DateUnlocked DATE
+);
+
+CREATE TABLE PlayerStats (
+  PlayerId INT PRIMARY KEY,
+  TotalMatches INT,
+  Wins INT,
+  Losses INT,
+  Ranking INT,
+  SkillId INT,
+  points INT,
+  coins INT,
+  LastUpdated DATETIME
+);
+
+CREATE TABLE SkillLevel (
+  SkillId INT PRIMARY KEY,
+  SkillName VARCHAR(255)
+);
+
+CREATE TABLE PlayerSkillHistory (
+  PlayerId INT,
+  SkillReachedId INT,
+  RecordedAt DATETIME,
+  PRIMARY KEY (PlayerId, RecordedAt)
+);
+
+CREATE TABLE GameStats (
+  GameId INT,
+  RegionId INT,
+  totalMatchesPlayed INT,
+  PlayersPlayed INT,
+  tournamentsCount INT,
+  GameModeId INT,
+  PRIMARY KEY (GameId, RegionId)
+);
+
+CREATE TABLE PlayerRankingHistory (
+  PlayerId INT,
+  Ranking INT,
+  RecordedAt DATETIME,
+  PRIMARY KEY (PlayerId, RecordedAt)
+);
+
+CREATE TABLE Tournament (
+  TournamentId INT PRIMARY KEY,
+  GameId INT,
+  GameModeId INT,
+  MatchTypeId INT,
+  Name VARCHAR(255),
+  StartDate DATE,
+  EndDate DATE,
+  PrizePool DECIMAL(10,2),
+  RegionId INT,
+  Description VARCHAR(255),
+  RegistrationStartDate DATETIME,
+  RegisterationEndDate DATETIME
+);
+
+CREATE TABLE TournamentRegistration (
+  RegistrationId INT,
+  TournamentId INT,
+  IsTeamTournament BOOLEAN,
+  PlayerId INT,
+  TeamId INT,
+  RegisteredAt DATETIME,
+  PRIMARY KEY (RegistrationId, TournamentId)
+);
+
+CREATE TABLE Bracket (
+  BracketId INT,
+  TournamentId INT,
+  Round INT,
+  Name VARCHAR(255),
+  PRIMARY KEY (TournamentId, BracketId, Round)
+);
+
+CREATE TABLE Matchs(
+  MatchId INT PRIMARY KEY,
+  GameId INT,
+  GameModeId INT,
+  MatchTypeId INT,
+  RegionId INT,
+  StartTime DATETIME,
+  EndTime DATETIME,
+  TournamentMatch BOOLEAN,
+  TournamentId INT,
+  bracketId INT,
+  Round INT
+);
+
+CREATE TABLE MatchParticipation (
+  MatchId INT,
+  Position INT,
+  PlayerId INT,
+  TeamId INT,
+  Score INT,
+  PRIMARY KEY (MatchId, Position)
+);
+
+CREATE TABLE PriceDistribution (
+  TournamentId INT,
+  Position INT,
+  Price INT,
+  PRIMARY KEY (TournamentId, Position)
+);
+
+CREATE TABLE TournamentLeaderBoard (
+  Id INT PRIMARY KEY,
+  TournamentId INT,
+  BracketId INT,
+  Round INT,
+  TeamId INT,
+  PlayerId INT,
+  Position INT
+);
+
+CREATE TABLE CurrencyPacks (
+  PackId INT PRIMARY KEY,
+  RealMoneyAmount INT,
+  packName VARCHAR(255),
+  quantity INT,
+  Description VARCHAR(255)
+);
+
+CREATE TABLE Item (
+  ItemId INT PRIMARY KEY,
+  Name VARCHAR(255),
+  GameId INT,
+  Description VARCHAR(255),
+  BaseValue DECIMAL(10,2)
+);
+
+CREATE TABLE Inventory (
+  PlayerId INT,
+  ItemId INT,
+  Quantity INT,
+  LastUpdatedTime TIMESTAMP,
+  PRIMARY KEY (PlayerId, ItemId)
+);
+
+CREATE TABLE RealTransaction (
+  TransactionId INT PRIMARY KEY,
+  playerId INT,
+  currencyPackId INT,
+  ModeOfPayment ENUM('UPI', 'Credit Card', 'Debit Card', 'Net Banking'),
+  Timestamp DATETIME
+);
+
+CREATE TABLE ItemsforSale (
+  ItemId INT,
+  PlayerId INT,
+  Quantity INT,
+  ListedPricePerItem INT,
+  PRIMARY KEY (PlayerId, ItemId)
+);
+
+CREATE TABLE VirtualTransaction (
+  VirtualTransactionId INT,
+  PlayerId INT,
+  Action ENUM('earn', 'store', 'tradeItem'),
+  ItemBought INT,
+  Quantity INT,
+  Timestamp DATETIME,
+  PRIMARY KEY (VirtualTransactionId, PlayerId)
+);
+
+CREATE TABLE Friends (
+  Player1Id INT,
+  Player2Id INT,
+  PRIMARY KEY (Player1Id, Player2Id)
+);
+
+CREATE TABLE Friendship_log (
+  RequesterId INT,
+  AddresseeId INT,
+  LastUpdatedStatus ENUM('Pending', 'Accepted', 'Decline', 'Removed'),
+  LastUpdatedAt DATETIME,
+  PRIMARY KEY (RequesterId, AddresseeId)
+);
+
+CREATE TABLE SubscriptionPacks (
+  SubscriptionPackId INT PRIMARY KEY,
+  packName VARCHAR(255),
+  Duration INT,
+  Amount INT
+);
+
+CREATE TABLE Subscription (
+  PurchaseId INT PRIMARY KEY,
+  PlayerId INT,
+  SubscriptionPackId INT,
+  PurchaseDate DATETIME,
+  EndDate DATETIME,
+  ModeOfPayment ENUM('UPI', 'Credit Card', 'Debit Card', 'Net Banking')
+);
+
+CREATE TABLE Message (
+  MessageId INT PRIMARY KEY,
+  SenderId INT,
+  ReceiverId INT,
+  Content VARCHAR(255),
+  SentAt DATETIME
+);
+
+CREATE TABLE Team (
+  TeamId INT PRIMARY KEY,
+  Name VARCHAR(255),
+  CreatedBy INT,
+  CreatedAt DATETIME
+);
+
+CREATE TABLE TeamMembership (
+  TeamId INT,
+  PlayerId INT,
+  PRIMARY KEY (TeamId, PlayerId)
+);
+
+CREATE TABLE Actions (
+  ActionId INT PRIMARY KEY,
+  ActionName VARCHAR(255),
+  ActionTaken VARCHAR(255)
+);
+
+CREATE TABLE ModerationAction (
+  Id INT PRIMARY KEY,
+  ReporterId INT,
+  PlayerId INT,
+  ActionId INT,
+  Reason VARCHAR(255),
+  Timestamp DATETIME
+);
